@@ -4,8 +4,9 @@ import "./globals.css"
 import Navbar from "@/components/navbar/page"
 
 const quicksand = Quicksand({
-  variable: "--font-quicksand",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -19,10 +20,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${quicksand.variable} antialiased`}>
+    <html lang="en" className={quicksand.className}>
+      <body className="flex flex-col min-h-screen">
         <Navbar />
-        {children}
+        <main className="flex-grow">{children}</main>
       </body>
     </html>
   )
