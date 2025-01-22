@@ -1,6 +1,13 @@
 "use client"
 import { useEffect, useState } from "react"
-import { collection, getDocs, addDoc, doc, updateDoc } from "firebase/firestore"
+import {
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore"
 import { db } from "@/firebase/config"
 import Image from "next/image"
 import axios from "axios"
@@ -67,7 +74,6 @@ const ProductBackofficePage: React.FC = () => {
           const signature = CryptoJS.SHA1(stringToSign).toString()
 
           try {
-            console.log("Deleting Image:", publicId)
             await axios.post(
               `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/destroy`,
               {
@@ -106,6 +112,45 @@ const ProductBackofficePage: React.FC = () => {
     await updateDoc(productRef, { ...productData, imageUrl: updatedImageUrl })
     setEditingProduct(null)
     alert("Product updated successfully")
+  }
+
+  const handleDeleteProduct = async (product: Product) => {
+    if (!product.id) return
+
+    if (product.imageUrl) {
+      const parts = product.imageUrl.split("/")
+      const publicIdWithExtension = parts.slice(-2).join("/") // Includes folder and file, e.g., "folder_name/file_name.jpg"
+      const publicId = publicIdWithExtension.split(".")[0] // Removes the extension
+
+      if (publicId) {
+        const timestamp = Math.floor(Date.now() / 1000) // Current time in seconds
+        const stringToSign = `public_id=${publicId}&timestamp=${timestamp}${process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET}`
+        const signature = CryptoJS.SHA1(stringToSign).toString()
+
+        try {
+          await axios.post(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/destroy`,
+            {
+              public_id: publicId,
+              timestamp,
+              api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+              signature,
+            }
+          )
+        } catch (error) {
+          console.error("Failed to delete the image from Cloudinary", error)
+        }
+      }
+    }
+
+    try {
+      const productRef = doc(db, "products", product.id)
+      await deleteDoc(productRef)
+      setProducts((prev) => prev.filter((p) => p.id !== product.id))
+      alert("Product deleted successfully")
+    } catch (error) {
+      console.error("Failed to delete product from Firestore", error)
+    }
   }
 
   const handleImageUpload = async (file: File) => {
@@ -224,6 +269,12 @@ const ProductBackofficePage: React.FC = () => {
                     className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                   >
                     Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product)}
+                    className="p-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
