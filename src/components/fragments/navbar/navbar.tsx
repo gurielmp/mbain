@@ -45,7 +45,7 @@ const Navbar: React.FC = () => {
               isScrolled ? "text-white" : "text-gray-200"
             }`}
           >
-            Mba Ain
+            Sharain | bite & bliss
           </span>
         </Link>
 
