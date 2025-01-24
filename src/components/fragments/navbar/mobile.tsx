@@ -154,7 +154,7 @@ const MobileNavbar: React.FC<{ isScrolled: boolean }> = ({ isScrolled }) => {
                 className="rounded-full relative z-10"
               />
             </div>
-            <span className="text-white text-lg mt-2">Mba Ain</span>
+            <span className="text-white text-lg mt-2">Sharain</span>
           </Link>
         </motion.div>
       </motion.div>
