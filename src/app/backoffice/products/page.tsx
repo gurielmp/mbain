@@ -238,49 +238,51 @@ const ProductBackofficePage: React.FC = () => {
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Products</h2>
-        <table className="min-w-full bg-white border">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border">Name</th>
-              <th className="py-2 px-4 border">Price</th>
-              <th className="py-2 px-4 border">Description</th>
-              <th className="py-2 px-4 border">Image</th>
-              <th className="py-2 px-4 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td className="py-2 px-4 border">{product.productName}</td>
-                <td className="py-2 px-4 border">{product.price}</td>
-                <td className="py-2 px-4 border">{product.description}</td>
-                <td className="py-2 px-4 border">
-                  <Image
-                    width={100}
-                    height={100}
-                    src={product.imageUrl}
-                    alt={product.productName}
-                    className="h-16 w-16 object-cover"
-                  />
-                </td>
-                <td className="py-2 px-4 border">
-                  <button
-                    onClick={() => setEditingProduct(product)}
-                    className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product)}
-                    className="p-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+          <table className="min-w-full table-auto">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="py-3 px-4 border text-left">Name</th>
+                <th className="py-3 px-4 border text-left">Price</th>
+                <th className="py-3 px-4 border text-left">Description</th>
+                <th className="py-3 px-4 border text-left">Image</th>
+                <th className="py-3 px-4 border text-left">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} className="border-b hover:bg-gray-100">
+                  <td className="py-2 px-4">{product.productName}</td>
+                  <td className="py-2 px-4">{product.price}</td>
+                  <td className="py-2 px-4">{product.description}</td>
+                  <td className="py-2 px-4">
+                    <Image
+                      width={100}
+                      height={100}
+                      src={product.imageUrl}
+                      alt={product.productName}
+                      className="h-16 w-16 object-cover rounded-lg"
+                    />
+                  </td>
+                  <td className="py-2 px-4">
+                    <button
+                      onClick={() => setEditingProduct(product)}
+                      className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product)}
+                      className="p-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editingProduct && (

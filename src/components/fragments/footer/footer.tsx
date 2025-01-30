@@ -43,8 +43,8 @@ const Footer = () => {
               <FaMapMarkerAlt className="text-gray-300 mt-1" />{" "}
               {/* Adjusted icon color for better visibility */}
               <p className="text-gray-100">
-                Bukit Cengkeh Berbunga Blok A3 No.4, 5, Kota Depok, Jawa Barat
-                16418
+                Bumi Asri Residence Kav. 3A, Jl.Lontar, Tanah Baru, Kecamatan
+                Beji, Kota Depok, Jawa Barat 16426, Indonesia
               </p>
             </div>
             <div className="flex items-center space-x-3">

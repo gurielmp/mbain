@@ -55,8 +55,11 @@ const FeaturesSection: React.FC = () => {
           className="flex justify-center items-center text-white mb-16 relative"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-[#7a6e3a] to-[#b9ac78] rounded-lg opacity-30 transform scale-105 z-0"></div>
-          <FaCheese className="text-4xl text-[#E5D5B0] mr-4 relative z-10" />{" "}
-          <h2 className="text-4xl text-[#E5D5B0] font-bold relative z-10 text-shadow-lg">
+          <FaCheese className="text-4xl text-[#E5D5B0] hidden lg:block mr-4 relative z-10" />{" "}
+          <h2
+            className="text-4xl text-[#E5D5B0] font-bold relative z-10 text-shadow-lg 
+              [text-shadow:2px_2px_4px_rgba(0,0,0,0.7)]"
+          >
             Why Choose Our Cheesy Risoles, Croquettes, and Bitterballen?
           </h2>
         </motion.div>
