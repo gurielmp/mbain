@@ -16,18 +16,18 @@ import CryptoJS from "crypto-js"
 interface Product {
   id?: string // Optional because Firestore will generate it
   productName: string
-  price: number
   description: string
   imageUrl: string
+  category: "Risoles" | "Croquette" | "Bitterballen" | "Other Delights" // Add category field
 }
 
 const ProductBackofficePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [newProduct, setNewProduct] = useState<Omit<Product, "id">>({
     productName: "",
-    price: 0,
     description: "",
     imageUrl: "",
+    category: "Risoles", // Set default category
   })
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -49,27 +49,43 @@ const ProductBackofficePage: React.FC = () => {
   }, [])
 
   const handleAddProduct = async () => {
-    await addDoc(collection(db, "products"), newProduct)
-    setNewProduct({ productName: "", price: 0, description: "", imageUrl: "" })
-    alert("Product added successfully")
+    try {
+      const docRef = await addDoc(collection(db, "products"), newProduct)
+      const addedProduct = { id: docRef.id, ...newProduct }
+      setProducts((prev) => [...prev, addedProduct])
+      setNewProduct({
+        productName: "",
+        description: "",
+        imageUrl: "",
+        category: "Risoles",
+      })
+      alert("Product added successfully")
+    } catch (error) {
+      console.error("Failed to add product", error)
+      alert("Failed to add product")
+    }
   }
 
   const handleEditProduct = async (newImageFile?: File) => {
     if (!editingProduct) return
 
-    const { id, imageUrl: existingImageUrl, ...productData } = editingProduct
+    const {
+      id,
+      imageUrl: existingImageUrl,
+      category,
+      ...productData
+    } = editingProduct
 
     let updatedImageUrl = existingImageUrl
 
     if (newImageFile) {
       if (existingImageUrl) {
-        // Extract public ID with folder from the existing image URL
         const parts = existingImageUrl.split("/")
-        const publicIdWithExtension = parts.slice(-2).join("/") // Includes folder and file, e.g., "folder_name/file_name.jpg"
-        const publicId = publicIdWithExtension.split(".")[0] // Removes the extension
+        const publicIdWithExtension = parts.slice(-2).join("/")
+        const publicId = publicIdWithExtension.split(".")[0]
 
         if (publicId) {
-          const timestamp = Math.floor(Date.now() / 1000) // Current time in seconds
+          const timestamp = Math.floor(Date.now() / 1000)
           const stringToSign = `public_id=${publicId}&timestamp=${timestamp}${process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET}`
           const signature = CryptoJS.SHA1(stringToSign).toString()
 
@@ -89,7 +105,6 @@ const ProductBackofficePage: React.FC = () => {
         }
       }
 
-      // Upload the new image
       const formData = new FormData()
       formData.append("file", newImageFile)
       formData.append("upload_preset", UPLOAD_PRESET)
@@ -107,9 +122,20 @@ const ProductBackofficePage: React.FC = () => {
       }
     }
 
-    // Update Firestore with the new data
     const productRef = doc(db, "products", id!)
-    await updateDoc(productRef, { ...productData, imageUrl: updatedImageUrl })
+    await updateDoc(productRef, {
+      ...productData,
+      imageUrl: updatedImageUrl,
+      category,
+    })
+
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === id
+          ? { ...product, ...productData, imageUrl: updatedImageUrl }
+          : product
+      )
+    )
     setEditingProduct(null)
     alert("Product updated successfully")
   }
@@ -119,11 +145,11 @@ const ProductBackofficePage: React.FC = () => {
 
     if (product.imageUrl) {
       const parts = product.imageUrl.split("/")
-      const publicIdWithExtension = parts.slice(-2).join("/") // Includes folder and file, e.g., "folder_name/file_name.jpg"
-      const publicId = publicIdWithExtension.split(".")[0] // Removes the extension
+      const publicIdWithExtension = parts.slice(-2).join("/")
+      const publicId = publicIdWithExtension.split(".")[0]
 
       if (publicId) {
-        const timestamp = Math.floor(Date.now() / 1000) // Current time in seconds
+        const timestamp = Math.floor(Date.now() / 1000)
         const stringToSign = `public_id=${publicId}&timestamp=${timestamp}${process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET}`
         const signature = CryptoJS.SHA1(stringToSign).toString()
 
@@ -198,18 +224,6 @@ const ProductBackofficePage: React.FC = () => {
             className="p-2 border rounded"
           />
           <input
-            type="number"
-            placeholder="Price"
-            value={newProduct.price}
-            onChange={(e) =>
-              setNewProduct({
-                ...newProduct,
-                price: parseFloat(e.target.value),
-              })
-            }
-            className="p-2 border rounded"
-          />
-          <input
             type="text"
             placeholder="Description"
             value={newProduct.description}
@@ -218,6 +232,25 @@ const ProductBackofficePage: React.FC = () => {
             }
             className="p-2 border rounded"
           />
+          <select
+            value={newProduct.category}
+            onChange={(e) =>
+              setNewProduct({
+                ...newProduct,
+                category: e.target.value as
+                  | "Risoles"
+                  | "Croquette"
+                  | "Bitterballen"
+                  | "Other Delights",
+              })
+            }
+            className="p-2 border rounded"
+          >
+            <option value="Risoles">Risoles</option>
+            <option value="Croquette">Croquette</option>
+            <option value="Bitterballen">Bitterballen</option>
+            <option value="Other Delights">Other Delights</option>
+          </select>
           <input
             type="file"
             accept="image/*"
@@ -238,55 +271,47 @@ const ProductBackofficePage: React.FC = () => {
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Products</h2>
-        <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="py-3 px-4 border text-left">Name</th>
-                <th className="py-3 px-4 border text-left">Price</th>
-                <th className="py-3 px-4 border text-left">Description</th>
-                <th className="py-3 px-4 border text-left">Image</th>
-                <th className="py-3 px-4 border text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-gray-100">
-                  <td className="py-2 px-4">{product.productName}</td>
-                  <td className="py-2 px-4">{product.price}</td>
-                  <td className="py-2 px-4">{product.description}</td>
-                  <td className="py-2 px-4">
-                    <Image
-                      width={100}
-                      height={100}
-                      src={product.imageUrl}
-                      alt={product.productName}
-                      className="h-16 w-16 object-cover rounded-lg"
-                    />
-                  </td>
-                  <td className="py-2 px-4">
-                    <button
-                      onClick={() => setEditingProduct(product)}
-                      className="mr-2 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product)}
-                      className="p-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className="space-y-4">
+          {products.map((product) => (
+            <li
+              key={product.id}
+              className="flex flex-col md:flex-row items-start md:items-center md:space-x-4 border border-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+            >
+              <Image
+                src={product.imageUrl}
+                alt={product.productName}
+                width={100}
+                height={100}
+                className="rounded mb-4 md:mb-0"
+              />
+              <div>
+                <h3 className="text-lg font-bold">{product.productName}</h3>
+                <p>{product.description}</p>
+                <p className="text-sm text-gray-500">
+                  Category: {product.category}
+                </p>
+              </div>
+              <div className="flex space-x-2 mt-4 md:mt-0">
+                <button
+                  onClick={() => handleDeleteProduct(product)}
+                  className="p-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setEditingProduct(product)}
+                  className="p-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+                >
+                  Edit
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {editingProduct && (
-        <div className="mb-8">
+        <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
           <div className="grid grid-cols-1 gap-4">
             <input
@@ -297,18 +322,6 @@ const ProductBackofficePage: React.FC = () => {
                 setEditingProduct({
                   ...editingProduct,
                   productName: e.target.value,
-                })
-              }
-              className="p-2 border rounded"
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              value={editingProduct.price}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  price: parseFloat(e.target.value),
                 })
               }
               className="p-2 border rounded"
@@ -325,18 +338,36 @@ const ProductBackofficePage: React.FC = () => {
               }
               className="p-2 border rounded"
             />
+            <select
+              value={editingProduct.category}
+              onChange={(e) =>
+                setEditingProduct({
+                  ...editingProduct,
+                  category: e.target.value as
+                    | "Risoles"
+                    | "Croquette"
+                    | "Bitterballen"
+                    | "Other Delights",
+                })
+              }
+              className="p-2 border rounded"
+            >
+              <option value="Risoles">Risoles</option>
+              <option value="Croquette">Croquette</option>
+              <option value="Bitterballen">Bitterballen</option>
+              <option value="Other Delights">Other Delights</option>
+            </select>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => {
-                if (e.target.files?.[0]) handleEditProduct(e.target.files[0])
-                else handleEditProduct()
+                if (e.target.files?.[0]) handleImageUpload(e.target.files[0])
               }}
               className="p-2 border rounded"
             />
             <button
               onClick={() => handleEditProduct()}
-              className="p-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Save Changes
             </button>

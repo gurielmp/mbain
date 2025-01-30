@@ -12,6 +12,7 @@ interface Product {
   price: number
   description: string
   imageUrl: string
+  category: "Risoles" | "Croquette" | "Bitterballen" | "Other Delights"
 }
 
 const MenuView: React.FC = () => {
@@ -29,6 +30,14 @@ const MenuView: React.FC = () => {
     fetchProducts()
   }, [])
 
+  // Kelompokkan produk berdasarkan kategori
+  const categories = ["Risoles", "Croquette", "Bitterballen", "Other Delights"]
+
+  const categorizedProducts = categories.reduce((acc, category) => {
+    acc[category] = products.filter((product) => product.category === category)
+    return acc
+  }, {} as Record<string, Product[]>)
+
   return (
     <div className="bg-gradient-to-b from-[#f7d8b7] to-[#f3a683] pt-24 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
@@ -41,60 +50,62 @@ const MenuView: React.FC = () => {
           Discover Our Delicious Selections
         </motion.h2>
 
-        <motion.h3
-          className="text-3xl font-bold text-[#2f1c1c] mb-6 flex items-center justify-center text-center bg-[#fef9f3] p-4 rounded-lg shadow-lg hover:bg-[#f9f0e1] hover:bg-opacity-60 transition-colors duration-300 bg-opacity-60"
-          initial={{ opacity: 0, y: 50 }} // Slide up effect on load
-          animate={{ opacity: 1, y: 0 }} // Animate to normal position
-          transition={{ duration: 0.8, ease: "easeOut" }} // Smooth transition on load
-          whileHover={{ scale: 0.95 }} // Scale on hover
-          whileTap={{ scale: 0.95 }} // Optional: Add a tap effect
-        >
-          <PiCheeseBold className="mr-4 text-[#d35400] text-4xl" />
-          Risoles
-        </motion.h3>
+        {categories.map((category) => {
+          const categoryProducts = categorizedProducts[category]
+          if (categoryProducts.length === 0) return null // Jangan tampilkan kategori jika tidak ada produk
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-16">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: index * 0.2 }}
-              className="relative bg-white bg-opacity-60 p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-3 group"
-            >
-              <div className="relative w-full h-56 mb-4 overflow-hidden rounded-lg">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.productName}
-                  layout="fill"
-                  objectFit="cover"
-                  className="transform group-hover:scale-110 transition-transform duration-300 rounded-lg"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
+          return (
+            <div key={category} className="mb-16">
+              <motion.h3
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-3xl font-bold text-[#2f1c1c] mb-6 flex items-center justify-center text-center bg-[#fef9f3] p-4 rounded-lg shadow-lg hover:bg-[#f9f0e1] hover:bg-opacity-60 transition-colors duration-300 bg-opacity-60"
+              >
+                <PiCheeseBold className="mr-4 text-[#d35400] text-4xl" />
+                {category}
+              </motion.h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {categoryProducts.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: index * 0.2 }}
+                    className="relative bg-white bg-opacity-60 p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-3 group"
+                  >
+                    <div className="relative w-full h-56 mb-4 overflow-hidden rounded-lg">
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.productName}
+                        layout="fill"
+                        objectFit="cover"
+                        className="transform group-hover:scale-110 transition-transform duration-300 rounded-lg"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-[#2f1c1c] mb-2">
+                      {product.productName}
+                    </h3>
+                    <p className="text-[#403d39] mb-4 leading-relaxed">
+                      {product.description}
+                    </p>
+                    <p className="text-sm text-[#403d39] italic">
+                      {product.category === "Risoles"
+                        ? "Frozen, 5 pcs per pack"
+                        : product.category === "Croquette" ||
+                          product.category === "Bitterballen"
+                        ? "Frozen, 10 pcs per pack"
+                        : null}
+                    </p>
+                  </motion.div>
+                ))}
               </div>
-              <h3 className="text-2xl font-semibold text-[#2f1c1c] mb-2">
-                {product.productName}
-              </h3>
-              <p className="text-[#403d39] mb-4 leading-relaxed">
-                {product.description}
-              </p>
-              {/* <p className="text-xl font-bold text-[#d35400] mb-2">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(product.price)}
-              </p> */}
-              <p className="text-sm text-[#403d39] italic">
-                {product.productName.toLowerCase().includes("risoles")
-                  ? "Frozen, 5 pcs per pack"
-                  : product.productName.toLowerCase().includes("croquette") ||
-                    product.productName.toLowerCase().includes("bitterballen")
-                  ? "Frozen, 10 pcs per pack"
-                  : null}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          )
+        })}
+
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
