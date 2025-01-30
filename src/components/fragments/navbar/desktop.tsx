@@ -20,7 +20,6 @@ const DesktopNavbar: React.FC<{ isScrolled: boolean }> = ({ isScrolled }) => {
       >
         {[
           { name: "Home", path: "/" },
-          { name: "About", path: "/about" },
           { name: "Menu", path: "/menu" },
           { name: "Contact", path: "/contact" },
         ].map((item) => (

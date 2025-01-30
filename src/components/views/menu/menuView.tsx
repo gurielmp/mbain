@@ -78,15 +78,20 @@ const MenuView: React.FC = () => {
               <p className="text-[#403d39] mb-4 leading-relaxed">
                 {product.description}
               </p>
-              <p className="text-xl font-bold text-[#d35400] mb-2">
+              {/* <p className="text-xl font-bold text-[#d35400] mb-2">
                 {new Intl.NumberFormat("id-ID", {
                   style: "currency",
                   currency: "IDR",
                 }).format(product.price)}
-              </p>
-              {/* <p className="text-sm text-[#403d39] italic">
-                {product.additionalInfo}
               </p> */}
+              <p className="text-sm text-[#403d39] italic">
+                {product.productName.toLowerCase().includes("risoles")
+                  ? "Frozen, 5 pcs per pack"
+                  : product.productName.toLowerCase().includes("croquette") ||
+                    product.productName.toLowerCase().includes("bitterballen")
+                  ? "Frozen, 10 pcs per pack"
+                  : null}
+              </p>
             </motion.div>
           ))}
         </div>

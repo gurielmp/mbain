@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from "react"
-import { FiMenu, FiX, FiHome, FiInfo, FiPhone } from "react-icons/fi"
+import { FiMenu, FiX, FiHome, FiPhone } from "react-icons/fi"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
@@ -83,20 +83,6 @@ const MobileNavbar: React.FC<{ isScrolled: boolean }> = ({ isScrolled }) => {
               onClick={toggleMenu}
             >
               Home
-            </Link>
-          </li>
-          <li
-            className={`border-b border-gray-600 pb-4 flex items-center ${
-              isCurrentRoute("/about") ? "text-yellow-400" : "text-white"
-            }`}
-          >
-            <FiInfo className="mr-2" />
-            <Link
-              href="/about"
-              className="text-lg font-medium hover:text-gray-400"
-              onClick={toggleMenu}
-            >
-              About
             </Link>
           </li>
           <li
