@@ -49,12 +49,12 @@ const ContactView = () => {
                     Phone / Message
                   </h4>
                   <a
-                    href="https://wa.me/6281234567890"
+                    href="https://wa.me/6289695765234"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#595230] hover:text-[#7a6e3a] transition-colors duration-300"
                   >
-                    +62 812-3456-7890
+                    +62 896-9576-5234
                   </a>
                 </div>
               </div>
