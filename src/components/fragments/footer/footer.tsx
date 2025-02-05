@@ -50,12 +50,12 @@ const Footer = () => {
             <div className="flex items-center space-x-3">
               <FaWhatsapp className="text-gray-300" />
               <a
-                href="https://wa.me/6281234567890"
+                href="https://wa.me/6289695765234"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition duration-300"
               >
-                Whatsapp Order : +62 812-3456-7890
+                Whatsapp Order : +62 896-9576-5234
               </a>
             </div>
             <p className="mt-6 text-gray-200 border-t border-gray-600 pt-4">

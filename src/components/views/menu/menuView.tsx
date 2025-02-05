@@ -120,7 +120,7 @@ const MenuView: React.FC = () => {
             croquettes, and bitterballen!
           </p>
           <motion.a
-            href="https://wa.me/6281234567890"
+            href="https://wa.me/6289695765234"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-gradient-to-r from-[#d35400] to-[#e67e22] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
